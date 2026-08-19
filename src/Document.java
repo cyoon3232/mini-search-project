@@ -1,11 +1,11 @@
 public class Document {
-    private int id;
-    private String fileName;
-    private String content;
+    private final int id;
+    private final String title;
+    private final String content;
 
-    public Document(int id, String fileName, String content) {
+    public Document(int id, String title, String content) {
         this.id = id;
-        this.fileName = fileName;
+        this.title = title;
         this.content = content;
     }
 
@@ -13,8 +13,8 @@ public class Document {
         return id;
     }
 
-    public String getFileName() {
-        return fileName;
+    public String getTitle() {
+        return title;
     }
 
     public String getContent() {
