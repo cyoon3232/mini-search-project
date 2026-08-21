@@ -3,10 +3,15 @@ public class Document {
     private final String title;
     private final String content;
 
-    public Document(int id, String title, String content) {
-        this.id = id;
-        this.title = title;
-        this.content = content;
+    public Document(int id, String title, String content) throws Exception {
+        if (id >= 0 && title != null && content != null) {
+            this.id = id;
+            this.title = title;
+            this.content = content;
+        } else {
+            throw new IllegalArgumentException();
+        }
+        
     }
 
     public int getId() {
