@@ -3,8 +3,6 @@ import java.util.List;
 
 public class Tokenizer {
 
-    boolean consecutiveBlanks;
-
     /**
      * Converts text into normalized searchable tokens while keeping token order
      * Tokens are converted to lowercase. Numbers are preserved. All punctuation

@@ -17,7 +17,7 @@ public class Document {
         if (title == null || title.isBlank()) {
             throw new IllegalArgumentException();
         }
-        if (content != null) {
+        if (content == null) {
             throw new IllegalArgumentException();
         }
         
