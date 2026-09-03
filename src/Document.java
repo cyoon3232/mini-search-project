@@ -11,14 +11,19 @@ public class Document {
      * @throws IllegalArgumentException if id < 0, title is blank or null, content is null
      */
     public Document(int id, String title, String content) {
-        if (id >= 0 && title != null && !title.isBlank() && content != null) {
-            this.id = id;
-            this.title = title;
-            this.content = content;
-        } else {
+        if (id < 0) {
+            throw new IllegalArgumentException();
+        }
+        if (title == null || title.isBlank()) {
+            throw new IllegalArgumentException();
+        }
+        if (content != null) {
             throw new IllegalArgumentException();
         }
         
+        this.id = id;
+        this.title = title;
+        this.content = content;
     }
 
     public int getId() {

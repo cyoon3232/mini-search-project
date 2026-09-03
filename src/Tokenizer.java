@@ -37,6 +37,7 @@ public class Tokenizer {
         c.toLowerCase();
 
         String current = texts.get(index);
+        // use LetterOrDigit
         boolean isPunctuation = c.equals(",") 
                                 || current.equals(".") 
                                 || current.equals("!") 
