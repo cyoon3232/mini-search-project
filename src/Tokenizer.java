@@ -39,4 +39,11 @@ public class Tokenizer {
 
     }
 
+    private void isInternalApostrophe() {
+        // before isPunctuation implementation, have isApostrophe
+        // check currentToken is not empty
+        // check the character before - is it valid?
+        // check the character after if the i is smaller than text.length() - 1
+    }
+
 }
