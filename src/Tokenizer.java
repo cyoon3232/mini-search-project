@@ -3,8 +3,6 @@ import java.util.List;
 
 public class Tokenizer {
 
-    List<String> texts;
-    int index;
     boolean consecutiveBlanks;
 
     /**
@@ -21,50 +19,24 @@ public class Tokenizer {
             throw new IllegalArgumentException();
         }
 
-        texts = new ArrayList<>();
-        texts.add("");
+        List<String> tokens = new ArrayList<>();
+        StringBuilder currentToken = new StringBuilder();
 
-        while (text.length() > 1) {
-            tokenizeEach(text.substring(0, 1));
-            text = text.substring(1);
-        }
-        tokenizeEach(text);
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            boolean isPunctuation = !Character.isLetterOrDigit(c);
 
-        return texts;
-    }
-
-    private void tokenizeEach(String c) {
-        c.toLowerCase();
-
-        String current = texts.get(index);
-        // use LetterOrDigit
-        boolean isPunctuation = c.equals(",") 
-                                || current.equals(".") 
-                                || current.equals("!") 
-                                || current.equals("?")
-                                || current.equals("-")
-                                || current.equals("_");
-
-        if (c.isBlank()) {
-            if (!current.isEmpty()) {
-                index++;
+            if (Character.isWhitespace(c) || isPunctuation) {
+                if (currentToken.length() > 0) {
+                    tokens.add(currentToken.toString().toLowerCase());
+                    currentToken.setLength(0);
+                }
+            } else {
+                currentToken.append(c);
             }
-            return;
         }
+        return tokens;
 
-        if (isPunctuation) {
-            if (!current.isEmpty()) {
-                index++;
-            }
-            return;
-        }
-
-        if (!current.isEmpty()) {
-            c = current + c;
-            texts.add(index, c);
-        } else {
-            texts.add(index, c);
-        }
     }
 
 }
