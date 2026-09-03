@@ -24,12 +24,13 @@ public class Tokenizer {
 
         for (int i = 0; i < text.length(); i++) {
             char c = text.charAt(i);
-            boolean isPunctuation = !Character.isLetterOrDigit(c);
+            boolean isPunctuationOrWhitespace = !Character.isLetterOrDigit(c);
 
-            if (Character.isWhitespace(c) || isPunctuation) {
-                if (currentToken.length() > 0) {
-                    tokens.add(currentToken.toString().toLowerCase());
-                    currentToken.setLength(0);
+            if (isPunctuationOrWhitespace) {
+                if (c == '\'' && isInternalApostrophe(i, text)) { // add curly
+                    currentToken.append(c);
+                } else if (currentToken.length() > 0) {
+                    addToTokensAndResetCurrentToken(tokens, currentToken);
                 }
             } else {
                 currentToken.append(c);
@@ -39,11 +40,15 @@ public class Tokenizer {
 
     }
 
-    private void isInternalApostrophe() {
-        // before isPunctuation implementation, have isApostrophe
-        // check currentToken is not empty
-        // check the character before - is it valid?
-        // check the character after if the i is smaller than text.length() - 1
+    private void addToTokensAndResetCurrentToken(List<String> tokens, StringBuilder currentToken) {
+        tokens.add(currentToken.toString().toLowerCase());
+        currentToken.setLength(0);
+    }
+
+    private boolean isInternalApostrophe(int i, String text) {
+        char before = (i > 0) ? text.charAt(i - 1) : null;
+        char after = (i < text.length() - 1) ? text.charAt(i - 1) : null;
+        return Character.isLetterOrDigit(before) && Character.isLetterOrDigit(after);
     }
 
 }
