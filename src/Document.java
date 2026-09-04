@@ -4,7 +4,7 @@ public class Document {
     private final String content;
     
     /**
-     * creates a document
+     * creates an immutable searchable document with ID, title, and content
      * @param id the id >= 0
      * @param title the title is not null and not blank
      * @param content the content is not null

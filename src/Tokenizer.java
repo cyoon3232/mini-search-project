@@ -25,7 +25,7 @@ public class Tokenizer {
             boolean isPunctuationOrWhitespace = !Character.isLetterOrDigit(c);
 
             if (isPunctuationOrWhitespace) {
-                if (c == '\'' && isInternalApostrophe(i, text)) { // add curly
+                if (c == '\'' && isInternalApostrophe(i, text)) { // TODO: add unicode curly apostrophes
                     currentToken.append(c);
                 } else if (currentToken.length() > 0) {
                     addToTokensAndResetCurrentToken(tokens, currentToken);
@@ -34,8 +34,11 @@ public class Tokenizer {
                 currentToken.append(c);
             }
         }
+        if (currentToken.length() > 0) {
+            addToTokensAndResetCurrentToken(tokens, currentToken);
+        }
+        
         return tokens;
-
     }
 
     private void addToTokensAndResetCurrentToken(List<String> tokens, StringBuilder currentToken) {
@@ -44,9 +47,12 @@ public class Tokenizer {
     }
 
     private boolean isInternalApostrophe(int i, String text) {
-        char before = (i > 0) ? text.charAt(i - 1) : null;
-        char after = (i < text.length() - 1) ? text.charAt(i - 1) : null;
-        return Character.isLetterOrDigit(before) && Character.isLetterOrDigit(after);
+        if (i <= 0 || i >= text.length() - 1) {
+            return false;
+        } 
+        boolean isCharBeforeValid = Character.isLetterOrDigit(text.charAt(i - 1));
+        boolean isCharAfterValid = Character.isLetterOrDigit(text.charAt(i + 1));
+        return isCharBeforeValid && isCharAfterValid;
     }
 
 }
