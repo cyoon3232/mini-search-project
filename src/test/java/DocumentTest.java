@@ -1,11 +1,13 @@
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 
 
 public class DocumentTest {
     @Test
-    void createsDocumentValid() {
+    void createsValidDocument() {
         Document doc = new Document(1, "Java", "Java is a programming language.");
         assertEquals(1, doc.getId());
         assertEquals("Java", doc.getTitle());
@@ -13,7 +15,7 @@ public class DocumentTest {
     }
 
     @Test
-    void emptyContentValid() {
+    void createsValidEmptyContent() {
         Document doc = new Document(2, "Empty", "");
         assertEquals(2, doc.getId());
         assertEquals("Empty", doc.getTitle());
@@ -21,17 +23,12 @@ public class DocumentTest {
     }
 
     @Test
-    void idLessThanZero() {
-        try {
-            Document doc = new Document(-1, "Java", "content");
-            fail();
-        } catch (IllegalArgumentException e) {
-            System.out.println("Id is less than zero");
-        }
+    void exceptionIdLessThanZero() {
+        assertThrows(IllegalArgumentException.class, () -> new Document(-1, "Java", ""));
     }
 
     @Test
-    void idZero() {
+    void createsValidIdZero() {
         Document doc = new Document(0, "Java", "content");
         assertEquals(0, doc.getId());
         assertEquals("Java", doc.getTitle());
@@ -39,33 +36,23 @@ public class DocumentTest {
     }
 
     @Test
-    void nullTitle() {
-        try {
-            Document doc = new Document(0, null, "Null");
-            fail();
-        } catch (IllegalArgumentException e) {
-            System.out.println("Title is null");
-        }
+    void exceptionNullTitle() {
+        assertThrows(IllegalArgumentException.class, () -> new Document(0, null, "null"));
     }
 
     @Test
-    void blankTitle() {
-        try {
-            Document doc = new Document(0, "", "Null");
-            fail();
-        } catch (IllegalArgumentException e) {
-            System.out.println("Title is blank");
-        }
+    void exceptionEmptyTitle() {
+        assertThrows(IllegalArgumentException.class, () -> new Document(0, "", "null"));
     }
 
     @Test
-    void nullContent() {
-        try {
-            Document doc = new Document(0, "Null", null);
-            fail();
-        } catch (IllegalArgumentException e) {
-            System.out.println("Content is null");
-        }
+    void exceptionBlankTitle() {
+        assertThrows(IllegalArgumentException.class, () -> new Document(0, "          ", "null"));
+    }
+
+    @Test
+    void exceptionNullContent() {
+        assertThrows(IllegalArgumentException.class, () -> new Document(0, "Null", null));
     }
 
 }
