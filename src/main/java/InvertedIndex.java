@@ -35,16 +35,8 @@ public class InvertedIndex {
     }
 
     private void addOccurrence(String term, int documentId, int position) {
-        if (!index.containsKey(term)) {
-            index.put(term, new HashMap<>());
-        } 
-
-        Map<Integer, List<Integer>> currentMap = index.get(term);
-        if (!currentMap.containsKey(documentId)) {
-            currentMap.put(documentId, new ArrayList<>());
-        }
-
-        List<Integer> currentList = currentMap.get(documentId);
+        Map<Integer, List<Integer>> currentMap = index.computeIfAbsent(term, termKey -> new HashMap<>());
+        List<Integer> currentList = currentMap.computeIfAbsent(documentId, docId -> new ArrayList<>());
         currentList.add(position);
     }
 
