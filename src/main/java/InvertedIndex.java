@@ -8,7 +8,7 @@ public class InvertedIndex {
     private final Map<String, Map<Integer, List<Integer>>> index = new HashMap<>();
 
     /**
-     * adds the normalized and ordered tokens of a document to its index according to its position in the document
+     * Adds the normalized and ordered tokens of a document to its index according to its position in the document
      * @param documentId the id of document is >= 0
      * @param tokens the normalized tokenized text in their original document order
      * @throws IllegalArgumentException if documentId < 0, tokens is null, or at least one token is null or blank
@@ -41,7 +41,7 @@ public class InvertedIndex {
     }
 
     /**
-     * returns the document IDs and token positions associated with a normalized term
+     * Returns the document IDs and token positions associated with a normalized term
      * @param term the term searched for
      * @return copy of postings; empty if the term doesn't exist in map
      * @throws IllegalArgumentException if term is null or blank
