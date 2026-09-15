@@ -1,15 +1,11 @@
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class InvertedIndex {
 
     private final Map<String, Map<Integer, List<Integer>>> index = new HashMap<>();
-    
-    /**
-     * documentId < 0, tokens == null, token == null or isBlank
-     * this is to check
-     */
 
     /**
      * adds the normalized and ordered tokens of a document to its index according to its position in the document
@@ -18,31 +14,61 @@ public class InvertedIndex {
      * @throws IllegalArgumentException if documentId < 0, tokens is null, or at least one token is null or blank
      */
     public void addDocument(int documentId, List<String> tokens) {
-        // documentid tokens token exception
-        // loop each tokens
+        if (documentId < 0) {
+            throw new IllegalArgumentException();
+        }
+
+        if (tokens == null) {
+            throw new IllegalArgumentException();
+        }
+
+        for (String token : tokens) {
+            if (token == null || token.isBlank()) {
+                throw new IllegalArgumentException();
+            }
+        }
+
+        for (int position = 0; position < tokens.size(); position++) {
+            String currentToken = tokens.get(position);
+            addOccurrence(currentToken, documentId, position);
+        }
     }
 
     private void addOccurrence(String term, int documentId, int position) {
-        // does term exist?
-        // no -> create new inner map
-        // yes -> existing map
+        if (!index.containsKey(term)) {
+            index.put(term, new HashMap<>());
+        } 
 
-        // documentid exist for the term?
-        // no -> create new List inside the map
-        // yes -> append to existing List
+        Map<Integer, List<Integer>> currentMap = index.get(term);
+        if (!currentMap.containsKey(documentId)) {
+            currentMap.put(documentId, new ArrayList<>());
+        }
+
+        List<Integer> currentList = currentMap.get(documentId);
+        currentList.add(position);
     }
 
     /**
-     * 
-     * @param term searched for
+     * returns the document IDs and token positions associated with a normalized term
+     * @param term the term searched for
      * @return copy of postings; empty if the term doesn't exist in map
      * @throws IllegalArgumentException if term is null or blank
      */
     public Map<Integer, List<Integer>> getPostings(String term) {
-        // term exception
-        // term exist?
-        // no -> return empty
-        // yes -> make a copy and return
-        return null;
+        if (term == null || term.isBlank()) {
+            throw new IllegalArgumentException();
+        }
+
+        if (!index.containsKey(term)) {
+            return new HashMap<>();
+        }
+
+        Map<Integer, List<Integer>> currentMap = index.get(term);
+        Map<Integer, List<Integer>> deepCopy = new HashMap<>();
+        for (var entry : currentMap.entrySet()) {
+            Integer key = entry.getKey();
+            deepCopy.put(key, new ArrayList<>(entry.getValue()));
+        }
+        return deepCopy;
     }
 }
