@@ -8,24 +8,48 @@ public class SearchEngine {
     private final InvertedIndex invertedIndex;
     private final Map<Integer, Document> documents;
 
+    /**
+     * Creates a search engine using a tokenizer and inverted index
+     * @param tokenizer used to normalize document
+     * @param invertedIndex used to store and retrieve term occrurences
+     * @throws IllegalArgumentException if tokenizer is null or invertedIndex is null
+     */
     public SearchEngine(Tokenizer tokenizer, InvertedIndex invertedIndex) {
+        if (tokenizer == null) {
+            throw new IllegalArgumentException();
+        }
+
+        if (invertedIndex == null) {
+            throw new IllegalArgumentException();
+        }
+
         this.tokenizer = tokenizer;
         this.invertedIndex = invertedIndex;
-        documents = new HashMap<>();
+        this.documents = new HashMap<>();
     }
 
     /**
-     * Adds a document to the collection that will be searched
+     * Indexes a document's content and stores the document for later retrieval
      * @param document the document to index
-     * @throws IllegalArgumentException if document is null or has an ID that already exists
+     * @throws IllegalArgumentException if document is null or has an ID that has already been indexed
      */
     public void index(Document document) {
+        if (document == null) {
+            throw new IllegalArgumentException();
+        }
 
+        if (documents.containsKey(document.getId())) {
+            throw new IllegalArgumentException();
+        }
+
+        List<String> tokens = tokenizer.tokenize(document.getContent());
+        invertedIndex.addDocument(document.getId(), tokens);
+
+        documents.put(document.getId(), document);
     }
 
     /**
      * Searches the indexed documents for the given query
-     * 
      * @param query non-null and non-blank query to evaluate
      * @param limit the maximum number of results to return; at least 1
      * @return matching documents ordered from highest to lowest in terms of relevance score;

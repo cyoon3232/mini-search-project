@@ -42,7 +42,7 @@ public class InvertedIndex {
 
     /**
      * Returns the document IDs and token positions associated with a normalized term
-     * @param term the term searched for
+     * @param term the normalized term to retrieve
      * @return copy of postings; empty if the term doesn't exist in map
      * @throws IllegalArgumentException if term is null or blank
      */
