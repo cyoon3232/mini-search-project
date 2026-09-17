@@ -1,6 +1,10 @@
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SearchEngine {
 
@@ -57,6 +61,43 @@ public class SearchEngine {
      * @throws IllegalArgumentException if the query is null or blank, or if limit is less than 1
      */
     public List<SearchResult> search(String query, int limit) {
+        if (query == null || query.isBlank()) {
+            throw new IllegalArgumentException();
+        }
+
+        if (limit < 1) {
+            throw new IllegalArgumentException();
+        }
+
+        List<String> queryTokens = tokenizer.tokenize(query);
+        if (queryTokens.isEmpty()) {
+            return List.of();
+        }
+
+        Set<String> distinctQueryTokens = new HashSet<>(queryTokens);
+        Map<Integer, Double> scores = new HashMap<>();
+
+        for (String term : distinctQueryTokens) {
+            Map<Integer, List<Integer>> postings = invertedIndex.getPostings(term);
+
+            for (var entry : postings.entrySet()) {
+                int documentId = entry.getKey();
+                double score = entry.getValue().size();
+
+                if (scores.containsKey(documentId)) {
+                    score += scores.get(documentId);
+                }
+
+                scores.put(documentId, score);
+            }
+        }
+
+        List<SearchResult> results = new ArrayList<>();
+        for (var score : scores.entrySet()) {
+            SearchResult result = new SearchResult(score.getKey(), score.getValue());
+            results.add(result);
+        }
+
         return null;
     }
     
