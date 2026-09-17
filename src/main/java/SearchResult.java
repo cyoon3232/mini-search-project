@@ -12,7 +12,6 @@ public class SearchResult {
         return documentId;
     }
 
-
     public double getScore() {
         return score;
     }
