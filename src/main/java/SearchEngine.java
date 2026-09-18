@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -11,6 +13,9 @@ public class SearchEngine {
     private final Tokenizer tokenizer;
     private final InvertedIndex invertedIndex;
     private final Map<Integer, Document> documents;
+
+    private static final Comparator<SearchResult> RESULT_ORDER = Comparator.comparingDouble(SearchResult::getScore).reversed()
+                                                                .thenComparing(SearchResult::getDocumentId);
 
     /**
      * Creates a search engine using a tokenizer and inverted index
@@ -93,12 +98,17 @@ public class SearchEngine {
         }
 
         List<SearchResult> results = new ArrayList<>();
-        for (var score : scores.entrySet()) {
-            SearchResult result = new SearchResult(score.getKey(), score.getValue());
+        for (var entry : scores.entrySet()) {
+            SearchResult result = new SearchResult(entry.getKey(), entry.getValue());
             results.add(result);
         }
+        
+        results.sort(RESULT_ORDER);
 
-        return null;
+        int resultCount = Math.min(limit, results.size());
+
+        List<SearchResult> resultList = new ArrayList<>(results.subList(0, resultCount));
+        return resultList;
     }
     
 }
