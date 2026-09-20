@@ -6,8 +6,6 @@ The current version supports document indexing, text tokenization, positional in
 
 It was intentionally built without search frameworks such as Lucene or Elasticsearch so the algorithm and indexing could be understood directly.
 
----
-
 ### Features
 Currently,
 - Document creation & validation
