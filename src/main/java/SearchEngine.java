@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Set;
 
 public class SearchEngine {
@@ -79,24 +80,35 @@ public class SearchEngine {
             return List.of();
         }
 
+        Map<Integer, Double> scores = computeScoresOfRelevantDocuments(queryTokens);
+        return selectTopResults(scores, limit);
+    }
+
+    private Map<Integer, Double> computeScoresOfRelevantDocuments(List<String> queryTokens) {
         Set<String> distinctQueryTokens = new HashSet<>(queryTokens);
         Map<Integer, Double> scores = new HashMap<>();
-
         for (String term : distinctQueryTokens) {
-            Map<Integer, List<Integer>> postings = invertedIndex.getPostings(term);
-
-            for (var entry : postings.entrySet()) {
-                int documentId = entry.getKey();
-                double score = entry.getValue().size();
-
-                if (scores.containsKey(documentId)) {
-                    score += scores.get(documentId);
-                }
-
-                scores.put(documentId, score);
-            }
+            addTermScoresForMultipleQuery(term, scores);
         }
+        return scores;
+    }
 
+    private void addTermScoresForMultipleQuery(String term, Map<Integer, Double> scores) {
+        Map<Integer, List<Integer>> postings = invertedIndex.getPostings(term);
+
+        for (var entry : postings.entrySet()) {
+            int documentId = entry.getKey();
+            double score = entry.getValue().size();
+
+            if (scores.containsKey(documentId)) {
+                score += scores.get(documentId);
+            }
+
+            scores.put(documentId, score);
+        }
+    }
+
+    private List<SearchResult> selectTopResults(Map<Integer, Double> scores, int limit) {
         List<SearchResult> results = new ArrayList<>();
         for (var entry : scores.entrySet()) {
             SearchResult result = new SearchResult(entry.getKey(), entry.getValue());
