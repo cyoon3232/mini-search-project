@@ -17,6 +17,14 @@ public class SearchEngine {
 
     private static final Comparator<SearchResult> RESULT_ORDER = Comparator.comparingDouble(SearchResult::getScore).reversed()
                                                                 .thenComparing(SearchResult::getDocumentId);
+    private static final Comparator<SearchResult> WORST_RESULT_ORDER = (a, b) -> {
+                                                                            int comparedScore = Double.compare(a.getScore(), b.getScore()); 
+                                                                            if (comparedScore != 0) {
+                                                                                return comparedScore;
+                                                                            }
+                                                                            int comparedID = Integer.compare(a.getDocumentId(), b.getDocumentId());
+                                                                            return comparedID;
+                                                                        }; // Or just RESULT_ORDER.reversed()
 
     /**
      * Creates a search engine using a tokenizer and inverted index
@@ -81,7 +89,7 @@ public class SearchEngine {
         }
 
         Map<Integer, Double> scores = computeScoresOfRelevantDocuments(queryTokens);
-        return selectTopResults(scores, limit);
+        return selectTopResultsWithPriorityQueue(scores, limit);
     }
 
     private Map<Integer, Double> computeScoresOfRelevantDocuments(List<String> queryTokens) {
@@ -108,7 +116,7 @@ public class SearchEngine {
         }
     }
 
-    private List<SearchResult> selectTopResults(Map<Integer, Double> scores, int limit) {
+    private List<SearchResult> selectTopResultsWithList(Map<Integer, Double> scores, int limit) {
         List<SearchResult> results = new ArrayList<>();
         for (var entry : scores.entrySet()) {
             SearchResult result = new SearchResult(entry.getKey(), entry.getValue());
@@ -121,6 +129,25 @@ public class SearchEngine {
 
         List<SearchResult> resultList = new ArrayList<>(results.subList(0, resultCount));
         return resultList;
+    }
+
+    private List<SearchResult> selectTopResultsWithPriorityQueue(Map<Integer, Double> scores, int limit) {
+        PriorityQueue<SearchResult> topResults = new PriorityQueue<>(WORST_RESULT_ORDER);
+        for (var entry : scores.entrySet()) {
+            SearchResult candidate = new SearchResult(entry.getKey(), entry.getValue());
+            if (topResults.size() < limit) {
+                topResults.offer(candidate);
+            } else {
+                SearchResult worst = topResults.peek();
+                if (RESULT_ORDER.compare(candidate, worst) < 0) { // candidate appears before worst == higher score
+                    topResults.poll();
+                    topResults.offer(candidate);
+                }
+            }
+        }
+        List<SearchResult> results = new ArrayList<>(topResults);
+        results.sort(RESULT_ORDER);
+        return results;
     }
     
 }
