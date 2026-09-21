@@ -17,14 +17,7 @@ public class SearchEngine {
 
     private static final Comparator<SearchResult> RESULT_ORDER = Comparator.comparingDouble(SearchResult::getScore).reversed()
                                                                 .thenComparing(SearchResult::getDocumentId);
-    private static final Comparator<SearchResult> WORST_RESULT_ORDER = (a, b) -> {
-                                                                            int comparedScore = Double.compare(a.getScore(), b.getScore()); 
-                                                                            if (comparedScore != 0) {
-                                                                                return comparedScore;
-                                                                            }
-                                                                            int comparedID = Integer.compare(a.getDocumentId(), b.getDocumentId());
-                                                                            return comparedID;
-                                                                        }; // Or just RESULT_ORDER.reversed()
+    private static final Comparator<SearchResult> WORST_RESULT_ORDER = RESULT_ORDER.reversed();
 
     /**
      * Creates a search engine using a tokenizer and inverted index
