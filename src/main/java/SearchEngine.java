@@ -16,7 +16,7 @@ public class SearchEngine {
     private final Map<Integer, Document> documents;
 
     private static final Comparator<SearchResult> RESULT_ORDER = Comparator.comparingDouble(SearchResult::getScore).reversed()
-                                                                .thenComparing(SearchResult::getDocumentId);
+                                                                .thenComparingInt(SearchResult::getDocumentId);
     private static final Comparator<SearchResult> WORST_RESULT_ORDER = RESULT_ORDER.reversed();
 
     /**
@@ -61,7 +61,7 @@ public class SearchEngine {
 
     /**
      * Searches the indexed documents for the given query
-     * @param query non-null and non-blank query to evaluate
+     * @param query non-null and non-blank query to evaluate (the search input string)
      * @param limit the maximum number of results to return; at least 1
      * @return matching documents ordered from highest to lowest in terms of relevance score;
      *         an empty list if no documents match
@@ -76,6 +76,10 @@ public class SearchEngine {
             throw new IllegalArgumentException();
         }
 
+        if (isPhraseQuery(query)) {
+            return null;
+        }
+
         List<String> queryTokens = tokenizer.tokenize(query);
         if (queryTokens.isEmpty()) {
             return List.of();
@@ -85,16 +89,22 @@ public class SearchEngine {
         return selectTopResultsWithPriorityQueue(scores, limit);
     }
 
+    /**
+     * Helper: Maps which documents have the terms and counts their scores
+     * @param queryTokens query terms, non-distinct
+     * @return a map with the key indicating documentId and the value indicating the score,
+     *         which is how many times the distinct query terms appeared on the document
+     */
     private Map<Integer, Double> computeScoresOfRelevantDocuments(List<String> queryTokens) {
         Set<String> distinctQueryTokens = new HashSet<>(queryTokens);
         Map<Integer, Double> scores = new HashMap<>();
         for (String term : distinctQueryTokens) {
-            addTermScoresForMultipleQuery(term, scores);
+            accumulateTermScores(term, scores);
         }
         return scores;
     }
 
-    private void addTermScoresForMultipleQuery(String term, Map<Integer, Double> scores) {
+    private void accumulateTermScores(String term, Map<Integer, Double> scores) {
         Map<Integer, List<Integer>> postings = invertedIndex.getPostings(term);
 
         for (var entry : postings.entrySet()) {
@@ -109,6 +119,14 @@ public class SearchEngine {
         }
     }
 
+    //-----------Sorting List--------------------
+
+    /**
+     * Helper: returns the list of SearchResult
+     * @param scores the map with documentId and scores of each document (not ordered)
+     * @param limit how many relevant documents we are returning
+     * @return a list of limit search results indicating relevant documents in descending order of score
+     */
     private List<SearchResult> selectTopResultsWithList(Map<Integer, Double> scores, int limit) {
         List<SearchResult> results = new ArrayList<>();
         for (var entry : scores.entrySet()) {
@@ -124,6 +142,12 @@ public class SearchEngine {
         return resultList;
     }
 
+    /**
+     * Helper: returns the list of SearchResult after working through it as a heap
+     * @param scores the map with documentId and scores of each document (not ordered)
+     * @param limit how many relevant documents we are returning
+     * @return a list of limit search results indicating relevant documents in descending order of score
+     */
     private List<SearchResult> selectTopResultsWithPriorityQueue(Map<Integer, Double> scores, int limit) {
         PriorityQueue<SearchResult> topResults = new PriorityQueue<>(WORST_RESULT_ORDER);
         for (var entry : scores.entrySet()) {
@@ -143,4 +167,13 @@ public class SearchEngine {
         return results;
     }
     
+    //------Phrase Query----------
+    private boolean isPhraseQuery(String query) {
+        String trimmedQuery = query.strip();
+
+        // too short to contain opening + closing quote?
+
+        // starts with " AND ends with "?
+        return false;
+    }
 }
